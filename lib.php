@@ -177,12 +177,52 @@ function get_days_unam_stats_usertime($f_inicio, $f_fin){
 }
 
 
+/**
+Calcula el total de tiempo en segundos de una serie de registros
+
+$registros	arr	Estos registros son obtenidos de la tabla mdl_logstore_standard_log
+$ventana	int	Cantidad en segundos del máximo tiempo permitido entre un evento y otro del log.
+*/
+function computo_tiempo_curso($registros, $ventana){
+
+    $sumas = array();
+//    $numero = count($registros, 0);
+    $contador = 0;
+    $anterior = 0;
+    $curso_anterior = 0;
+
+    foreach($registros as $registro){
+	if($contador == 0){
+		$curso_anterior = $registro->courseid;
+		$sumas["$curso_anterior"]= 0; 
+		$anterior = $registro->timecreated;
+	}else{
+		if($curso_anterior != $registro->courseid){
+			$curso_anterior = $registro->courseid;
+		}
+
+		if (!array_key_exists($registro->courseid, $sumas)){
+			$sumas["$curso_anterior"]= 0;
+		}
+
+		$diferencia = $registro->timecreated - $anterior;
+		if($diferencia <= $ventana){
+			$sumas["$curso_anterior"] += $diferencia;
+		}
+		$anterior = $registro->timecreated;		
+	}
+        $contador++;
+    }
+    return $sumas;
+}
+
+
 
 
 /**
 Calcula el total de tiempo en segundos de una serie de registros
 
-$registros	arr	Estos registros son obtenidos de la tabla unam_stats_usertime
+$registros	arr	Estos registros son obtenidos de la tabla mdl_logstore_standard_log
 $ventana	int	Cantidad en segundos del máximo tiempo permitido entre un evento y otro del log.
 */
 function computo_tiempo($registros, $ventana){
@@ -251,6 +291,29 @@ function insert_unam_stats_usertime($userid, $time_start, $time_end, $total_time
     $registro->total_time = $total_time;
 
     $tmp = $DB->insert_record('unam_stats_usertime', $registro, false);
+}
+
+
+/**
+Realiza una inserción a la tabla unam_stats_usertime_course
+
+$userid		bigint
+$time_start   	bigint    fecha en formato timestamp
+$time_end      	bigint    fecha en formato timestamp
+$total_time    	bigint
+*/
+
+function insert_unam_stats_usertime_course($userid, $time_start, $time_end, $total_time, $courseid){
+    global $DB;
+
+    $registro = new stdClass();
+    $registro->userid = $userid;
+    $registro->time_start = $time_start;
+    $registro->time_end = $time_end;
+    $registro->total_time = $total_time;
+    $registro->courseid = $courseid;
+
+    $tmp = $DB->insert_record('unam_stats_usertime_course', $registro, false);
 }
 
 
@@ -1316,9 +1379,14 @@ function calculate_unam_stats_usertime_for_instalation(){
             if($elements->count > 0){
                 for ($i = 0; $i < $n_days; $i++){
                     $user_logs = consulta_logs_usuario($this_user->id, $arr_days[$i], $arr_days[$i] + 86399 );
-                    $tiempo = computo_tiempo($user_logs, $window);
+                    $tiempo  = computo_tiempo($user_logs, $window);
+                    $tiempos = computo_tiempo_curso($user_logs, $window);
                     if ($tiempo > 0)
                         insert_unam_stats_usertime($this_user->id,  $arr_days[$i],  $arr_days[$i] + 86399, $tiempo);
+                    foreach( $tiempos as $id_curso=>$tiempo_curso){
+                        if($tiempo_curso > 0)
+                            insert_unam_stats_usertime_course($this_user->id,  $arr_days[$i],  $arr_days[$i] + 86399, $tiempo_curso, $id_curso);
+                    }
                 }             
             }
         }
@@ -1381,9 +1449,14 @@ function calculate_unam_stats_usertime_for_instalation(){
             if($elements->count > 0){
                 for ($i = 0; $i < $n_days; $i++){
                     $user_logs = consulta_logs_usuario($this_user->id, $arr_days[$i], $arr_days[$i] + 86399 );
-                    $tiempo = computo_tiempo($user_logs, $window);
+                    $tiempo  = computo_tiempo($user_logs, $window);
+                    $tiempos = computo_tiempo_curso($user_logs, $window);
                     if ($tiempo > 0)
                         insert_unam_stats_usertime($this_user->id,  $arr_days[$i],  $arr_days[$i] + 86399, $tiempo);
+                    foreach( $tiempos as $id_curso=>$tiempo_curso){
+                        if($tiempo_curso > 0)
+                            insert_unam_stats_usertime_course($this_user->id,  $arr_days[$i],  $arr_days[$i] + 86399, $tiempo_curso, $id_curso);
+                    }
                 }             
             }
         }
