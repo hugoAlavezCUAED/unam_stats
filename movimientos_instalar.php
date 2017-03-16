@@ -18,6 +18,9 @@ if($accion == 2){
   	if($table_name == "unam_stats_usertime"){
     	create_table_unam_stats_usertime($table_name);
   	}
+  	if($table_name == "unam_stats_usertime_course"){
+  		create_table_unam_stats_usertime_course($table_name);	
+  	}
 }
 echo $result;
 ?>

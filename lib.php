@@ -1149,7 +1149,36 @@ CREATE TABLE {$CFG->prefix}$table_name (
   time_start bigint(20) NOT NULL,
   time_end bigint(20) NOT NULL,
   total_time bigint(20) NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY time_start (time_start), 
+  KEY time_end (time_end), 
+  KEY userid (userid)  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+$data = $DB->execute($query);
+$determinacion = "Se ha creado la tabla";
+return $determinacion;
+}
+
+/**
+Esta función crea la tabla unam_stats_usertime_course en la base de datos
+$table_name     string
+**/
+function create_table_unam_stats_usertime_course($table_name){
+global $DB;
+global $CFG;
+$query = "
+CREATE TABLE {$CFG->prefix}$table_name (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  userid bigint(20) NOT NULL,
+  time_start bigint(20) NOT NULL,
+  time_end bigint(20) NOT NULL,
+  total_time bigint(20) NOT NULL,
+  courseid bigint(20) NOT NULL,
+  PRIMARY KEY (id),
+  KEY time_start (time_start), 
+  KEY time_end (time_end), 
+  KEY userid (userid),
+  KEY courseid (courseid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 $data = $DB->execute($query);
 $determinacion = "Se ha creado la tabla";

@@ -213,6 +213,83 @@
 					</div>
 				</td>
           	</tr>
+
+
+          	<tr>
+            	<td>Tabla unam_stats_usertime_course</td>
+            	<td>Tabla almacenadora del tiempo en plataforma referenciada por usuario y curso</td>
+				<!-- COLUMNA QUE VERIFICA SI LA TABLA ESTÁ EN EXISTENCIA-->
+            	<td>
+            		<?php
+              			$existe_unam_stats_usertime_course = check_table_moodle("unam_stats_usertime_course");
+						if($existe_unam_stats_usertime_course)
+							echo "Si";
+						else
+							echo "No";
+              		?>
+            	</td>
+				<!-- COLUMNA QUE MUESTRA EN CASO DE EXISTIR LA TABLA, SI ÉSTA POSEE DATOS  -->
+				<td>
+					<?php
+						if($existe_unam_stats_usertime_course){
+							$data_table = check_table_data("unam_stats_usertime_course");
+							if($data_table)
+								echo "Si";
+							else
+								echo "No";
+						}
+						else
+							echo "No existe la tabla";
+					?>
+				</td>
+				<!-- COLUMNA QUE MUESTRA EN CASO DE EXISTIR LA TABLA Y POSEER DATOS, EL ÚLTIMO DATO CALCULADO  -->
+				<td>
+					<?php
+						if($existe_unam_stats_usertime_course){
+							if($data_table){
+								$last_day = calculated_last_day("unam_stats_usertime_course");
+								echo transformation_of_date($last_day);
+							}
+							else{
+								echo "No hay datos en la tabla";
+							}
+						}
+						else{
+							echo "No existe la tabla";
+						}
+					?>
+				</td>
+				<!-- COLUMNA QUE MUESTRA LAS ACCIONES A REALIZAR-->
+				<td>
+					<div id="contenido-tbl-userdata-course">
+						<?php
+							if($existe_unam_stats_usertime_course){
+								if($data_table){
+									?>
+										<form name="truncate" id="truncate-utc" action="truncate" method="post">
+											<input type="hidden" id="table-name-truncate-course" name="table" value="unam_stats_usertime_course" />
+											<input type="hidden" id="action" name="action" value="1" />
+											<input type="button" name="send" value="truncate" id="button-truncate-utc"/>
+										</form>
+									<?php
+								}
+								else{
+									echo "Tabla vacía";
+								}
+							}
+							else{
+						?>
+									<form name="create" id="create-utc" action="create" method="post">
+										<input type="hidden" id="table-name-create-course" name="table" value="unam_stats_usertime_course"/>
+										<input type="hidden" id="action" name="action" value="2"/>
+										<input type="button" name="send" value="create" id="button-create-utc"/>
+									</form>
+							<?php
+							}
+							?>
+					</div>
+				</td>
+          	</tr>
         </tbody>
     </table>
 </fieldset>

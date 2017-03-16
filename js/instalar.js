@@ -46,7 +46,7 @@ $( document ).ready(function() {
 
 	//Botón create table unam_stats_usertime
 	$(function(){
-		$("#button-create-ut").click(function(){
+		$("#button-create-ut").click(function(){			
 			var url = "movimientos_instalar.php";
 			$.ajax({
 				type: "POST",
@@ -77,6 +77,44 @@ $( document ).ready(function() {
 			return false;
 		});
 	});
+
+
+
+	//Botón create table unam_stats_usertime_course
+	$(function(){
+		$("#button-create-utc").click(function(){			
+			var url = "movimientos_instalar.php";
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: $("#create-utc").serialize(),
+				success: function(data){					
+					$("#contenido-tbl-userdata-course").empty();
+					$("#contenido-tbl-userdata-course").html(data);
+				}
+			});
+			return false;			
+		});
+	});
+
+	//Botón Truncate table unam_stats_usertime
+	$(function(){
+		$("#button-truncate-utc").click(function(){
+			var url = "movimientos_instalar.php";
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: $("#truncate-utc").serialize(),
+				success: function(data){
+					$("#contenido-tbl-userdata-course").empty();
+					$("#contenido-tbl-userdata-course").html(data);
+				}
+			});
+			return false;
+		});
+	});
+
+
 
 	//Botón que envía el formulario stats
 	$(function(){
